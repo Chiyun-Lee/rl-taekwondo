@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://j6htjo4abpft"]
+
+[ext_resource type="Script" uid="uid://qhlgps52fmv5" path="res://Scripts/PlayerMovement.cs" id="1_playermov"]
+[ext_resource type="Shader" uid="uid://c0akbsw06s8bp" path="res://Assets/Materials/CheckerFloor.gdshader" id="2_dnd5l"]
+[ext_resource type="Script" uid="uid://clut7dl83nlmh" path="res://Scripts/HumanInput.cs" id="2_humaninput"]
+[ext_resource type="Script" uid="uid://cfcd1xhh1vbgw" path="res://Scripts/ActionLog.cs" id="3_actionlog"]
+[ext_resource type="Script" uid="uid://b55vjr34bwyae" path="res://Scripts/FloorSetup.cs" id="4_floorsetup"]
+[ext_resource type="Script" uid="uid://bb6oa67813jtt" path="res://Scripts/CharacterStateMachine.cs" id="5_csm"]
+[ext_resource type="PackedScene" uid="uid://w76alaqc2uxb" path="res://Assets/Models/X Bot@T-Pose.fbx" id="6_xbot"]
+[ext_resource type="Script" uid="uid://bshm2idj4k7tj" path="res://Scripts/AnimationSetup.cs" id="7_animsetup"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+
+[sub_resource type="Sky" id="Sky_sky"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_0a0mn"]
+background_mode = 2
+sky = SubResource("Sky_sky")
+ambient_light_source = 3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7yicx"]
+render_priority = 0
+shader = ExtResource("2_dnd5l")
+shader_parameter/square_size = 1.0
+shader_parameter/color_a = Color(0.85, 0.85, 0.85, 1)
+shader_parameter/color_b = Color(0.25, 0.25, 0.25, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_qotlx"]
+size = Vector2(20, 20)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_floor"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_eo7g3"]
+radius = 0.2
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xqu6k"]
+radius = 0.3
+height = 1.8
+
+[node name="Sandbox" type="Node3D" unique_id=1789935236]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1225151737]
+transform = Transform3D(1, 0, 0, 0, 0.866025, -0.5, 0, 0.5, 0.866025, 0, 5, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1161514332]
+environment = SubResource("Environment_0a0mn")
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1399497141]
+script = ExtResource("4_floorsetup")
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floor" unique_id=1373846105]
+material_override = SubResource("ShaderMaterial_7yicx")
+mesh = SubResource("PlaneMesh_qotlx")
+
+[node name="FloorCollision" type="CollisionShape3D" parent="Floor" unique_id=1499680884]
+shape = SubResource("WorldBoundaryShape3D_floor")
+
+[node name="CameraTarget" type="MeshInstance3D" parent="." unique_id=1866187662]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+mesh = SubResource("SphereMesh_eo7g3")
+
+[node name="Player" type="CharacterBody3D" parent="." unique_id=1967001651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+script = ExtResource("1_playermov")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=1126567618]
+shape = SubResource("CapsuleShape3D_xqu6k")
+
+[node name="HumanInput" type="Node" parent="Player" unique_id=1587542174]
+script = ExtResource("2_humaninput")
+
+[node name="CharacterStateMachine" type="Node" parent="Player" unique_id=1234567890]
+script = ExtResource("5_csm")
+
+[node name="CharacterVisual" type="Node3D" parent="Player" unique_id=73044108]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.9, 0)
+script = ExtResource("7_animsetup")
+
+[node name="XBot" parent="Player/CharacterVisual" unique_id=999000002 instance=ExtResource("6_xbot")]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player/CharacterVisual" unique_id=999000004]
+
+[node name="AnimationTree" type="AnimationTree" parent="Player/CharacterVisual" unique_id=999000005]
+anim_player = NodePath("../AnimationPlayer")
+
+[node name="CameraRoot" type="Node3D" parent="Player" unique_id=279987380]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player/CameraRoot" unique_id=460506306]
+
+[node name="ActionLog" type="CanvasLayer" parent="." unique_id=1166045846]
+script = ExtResource("3_actionlog")
